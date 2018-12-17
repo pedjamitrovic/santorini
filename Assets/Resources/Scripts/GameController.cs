@@ -65,6 +65,7 @@ public class GameController : MonoBehaviour
                 break;
             }
             DisableAllFields();
+            ActivatePlayerFigures();
             await onTurn.SelectFigure(semaphore);
             EnableAllFields();
             if (ShowPossibleMoves() == 0)
@@ -73,10 +74,11 @@ public class GameController : MonoBehaviour
                 selectedFigure = null;
                 continue;
             }
+            DisableAllFigures();
+            DisableAllFields();
             await onTurn.MoveFigure(semaphore);
             if (selectedFigure == null)
             {
-                ActivatePlayerFigures();
                 continue;
             }
             MoveFigure();
@@ -128,34 +130,35 @@ public class GameController : MonoBehaviour
                 count++;
             }
         }
-        DisableAllFigures();
-        DisableAllFields();
         return count;
     }
     int CountPossibleMoves(string currentPosition)
     {
+        EnableAllFields();
         int count = 0;
         string[] neighbours = fields[currentPosition].GetComponent<Field>().neighbours;
         for (int i = 0; i < neighbours.Length; i++)
         {
-            if (fields[neighbours[i]].GetComponent<Field>().enabled && fields[neighbours[i]].GetComponent<Field>().level <= fields[currentPosition].GetComponent<Field>().level)
+            if (fields[neighbours[i]].GetComponent<Field>().enabled && fields[neighbours[i]].GetComponent<Field>().level - 1 <= fields[currentPosition].GetComponent<Field>().level)
             {
                 count++;
             }
         }
+        DisableAllFields();
         return count;
     }
     bool NoMovesLeft()
     {
+        bool val = false;
         if (onTurn == first)
         {
-            return (CountPossibleMoves(playerFigures[0].GetComponent<PlayerFigure>().position) == 0 && CountPossibleMoves(playerFigures[1].GetComponent<PlayerFigure>().position) == 0);
+            val = (CountPossibleMoves(playerFigures[0].GetComponent<PlayerFigure>().position) == 0 && CountPossibleMoves(playerFigures[1].GetComponent<PlayerFigure>().position) == 0);
         }
         else if (onTurn == second)
         {
-            return (CountPossibleMoves(playerFigures[2].GetComponent<PlayerFigure>().position) == 0 && CountPossibleMoves(playerFigures[3].GetComponent<PlayerFigure>().position) == 0);
+            val = (CountPossibleMoves(playerFigures[2].GetComponent<PlayerFigure>().position) == 0 && CountPossibleMoves(playerFigures[3].GetComponent<PlayerFigure>().position) == 0);
         }
-        return false;
+        return val;
     }
     void ShowPossibleBuilds()
     {
