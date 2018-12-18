@@ -1,22 +1,17 @@
-﻿using etf.santorini.mp150608d;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading;
-using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace etf.santorini.mp150608d
 {
     public class GameController : MonoBehaviour
     {
-        public TextMeshProUGUI onTurnText;
-        public TextMeshProUGUI nextMoveText;
+        public PrefabSpawner prefabSpawner;
+        public UserInterface UI;
         public SemaphoreSlim semaphore;
         public GameObject selectedField;
         public GameObject selectedFigure;
-        public GameObject prefabSpawner;
-        private Dictionary<string, GameObject> fields;
+        public Dictionary<string, GameObject> fields;
         private List<GameObject> playerFigures;
         private Player first;
         private Player second;
@@ -35,8 +30,8 @@ namespace etf.santorini.mp150608d
             {
                 fields.Add(fieldObjects[i].GetComponent<Field>().position, fieldObjects[i]);
             }
-            first = new Human("PLAYER 1");
-            second = new Human("PLAYER 2");
+            first = new RandomBot("PLAYER 1");
+            second = new RandomBot("PLAYER 2");
             log = new Logger(first, second, "proba" + ".txt");
             onTurn = first;
             StartGame();
@@ -100,7 +95,10 @@ namespace etf.santorini.mp150608d
         }
         void FinishGame()
         {
-            nextMoveText.text = "GAME OVER - " + onTurn.Id() + " WINS";
+            UI.onTurnText.text = "";
+            UI.nextMoveText.text = "";
+            UI.gameOverText.text = "GAME OVER - " + onTurn.Id() + " WINS";
+            selectedFigure = null;
             DisableAllFigures();
             DisableAllFields();
             log.WriteToFile();
@@ -119,7 +117,7 @@ namespace etf.santorini.mp150608d
         }
         void InstantiatePlayerFigure(Material material)
         {
-            playerFigures.Add(prefabSpawner.GetComponent<PrefabSpawner>().SpawnPlayerFigure(selectedField, material));
+            playerFigures.Add(prefabSpawner.SpawnPlayerFigure(selectedField, material));
             selectedField = null;
         }
         int ShowPossibleMoves()
@@ -168,18 +166,7 @@ namespace etf.santorini.mp150608d
         }
         void ShowPossibleBuilds()
         {
-            string firstPosition = "", secondPosition = "";
-            if (onTurn == first)
-            {
-                firstPosition = playerFigures[0].GetComponent<PlayerFigure>().position;
-                secondPosition = playerFigures[1].GetComponent<PlayerFigure>().position;
-            }
-            else
-            {
-                firstPosition = playerFigures[2].GetComponent<PlayerFigure>().position;
-                secondPosition = playerFigures[3].GetComponent<PlayerFigure>().position;
-            }
-            string[] neighbours = fields[firstPosition].GetComponent<Field>().neighbours;
+            string[] neighbours = fields[selectedFigure.GetComponent<PlayerFigure>().position].GetComponent<Field>().neighbours;
             for (int i = 0; i < neighbours.Length; i++)
             {
                 if (fields[neighbours[i]].GetComponent<Field>().enabled && fields[neighbours[i]].GetComponent<Field>().level != 4)
@@ -188,19 +175,9 @@ namespace etf.santorini.mp150608d
                     fields[neighbours[i]].GetComponent<Field>().paused = true;
                 }
             }
-            neighbours = fields[secondPosition].GetComponent<Field>().neighbours;
-            for (int i = 0; i < neighbours.Length; i++)
-            {
-                if (fields[neighbours[i]].GetComponent<Field>().enabled && fields[neighbours[i]].GetComponent<Field>().level != 4)
-                {
-                    fields[neighbours[i]].GetComponent<Field>().GetComponent<Renderer>().material = fields[neighbours[i]].GetComponent<Field>().selectMaterial;
-                    fields[neighbours[i]].GetComponent<Field>().paused = true;
-                }
-            }
+            selectedFigure.GetComponent<PlayerFigure>().Disable();
             DisableAllFigures();
-            selectedFigure = playerFigures[0]; // dummy
             DisableAllFields();
-            selectedFigure = null;
         }
         void MoveFigure()
         {
@@ -211,7 +188,6 @@ namespace etf.santorini.mp150608d
             selectedFigure.GetComponent<PlayerFigure>().level = selectedField.GetComponent<Field>().level + 1;
             if (selectedFigure.GetComponent<PlayerFigure>().level == 4) endGame = true;
             selectedField = null;
-            selectedFigure = null;
             log.LogGameMove(onTurn, previousFigurePosition, nextFigurePosition, previousFigurePosition);
         }
         void BuildNewLevel()
@@ -219,14 +195,15 @@ namespace etf.santorini.mp150608d
             if (selectedField.GetComponent<Field>().level > 3) return;
             if (selectedField.GetComponent<Field>().level < 3)
             {
-                prefabSpawner.GetComponent<PrefabSpawner>().SpawnField(selectedField);
+                prefabSpawner.SpawnField(selectedField);
             }
             else
             {
-                prefabSpawner.GetComponent<PrefabSpawner>().SpawnHemisphere(selectedField);
+                prefabSpawner.SpawnHemisphere(selectedField);
             }
             selectedField.GetComponent<Field>().level++;
             log.AlterLastBuildPosition(onTurn, selectedField.GetComponent<Field>().position);
+            selectedField = null;
         }
         void EnableAllFields()
         {
@@ -277,6 +254,12 @@ namespace etf.santorini.mp150608d
                 if (playerFigures.Count > 2 && CountPossibleMoves(playerFigures[2].GetComponent<PlayerFigure>().position) > 0) playerFigures[2].GetComponent<PlayerFigure>().Enable();
                 if (playerFigures.Count > 3 && CountPossibleMoves(playerFigures[3].GetComponent<PlayerFigure>().position) > 0) playerFigures[3].GetComponent<PlayerFigure>().Enable();
             }
+        }
+        public GameObject FetchMyFigure(Player p, int index)
+        {
+            if (p == first) return playerFigures[index];
+            else if (p == second) return playerFigures[index + 2];
+            return null;
         }
     }
 }

@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace etf.santorini.mp150608d
 {
@@ -35,7 +33,8 @@ namespace etf.santorini.mp150608d
         public GameObject SpawnField(GameObject onField)
         {
             GameObject go = Instantiate(onField) as GameObject;
-            go.GetComponent<Field>().enabled = false;
+            //go.GetComponent<Field>().enabled = false;
+            go.GetComponent<Field>().Disable();
             onField.GetComponent<Field>().transform.position = new Vector3(onField.GetComponent<Field>().transform.position.x, onField.GetComponent<Field>().transform.position.y + 0.5f, onField.GetComponent<Field>().transform.position.z);
             onField.GetComponent<Field>().transform.localScale = new Vector3(onField.GetComponent<Field>().transform.lossyScale.x * 0.8f, onField.GetComponent<Field>().transform.lossyScale.y, onField.GetComponent<Field>().transform.lossyScale.z * 0.8f);
             go.transform.parent = onField.transform;
@@ -45,7 +44,8 @@ namespace etf.santorini.mp150608d
         {
             GameObject go = Instantiate(hemisphere) as GameObject;
             go.transform.position = new Vector3(onField.GetComponent<Field>().transform.position.x, onField.GetComponent<Field>().transform.position.y + 0.5f, onField.GetComponent<Field>().transform.position.z);
-            onField.GetComponent<Field>().enabled = false;
+            //onField.GetComponent<Field>().enabled = false;
+            onField.GetComponent<Field>().Disable();
             go.transform.parent = onField.transform;
             return go;
         }

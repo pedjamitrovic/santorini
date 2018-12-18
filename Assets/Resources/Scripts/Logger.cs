@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace etf.santorini.mp150608d
 {
@@ -142,8 +139,7 @@ namespace etf.santorini.mp150608d
                     }
                 }
             }
-            catch(Exception e) { e.ToString(); }
+            catch (Exception e) { e.ToString(); }
         }
-
     }
 }

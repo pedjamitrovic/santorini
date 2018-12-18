@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace etf.santorini.mp150608d
 {
@@ -28,7 +26,7 @@ namespace etf.santorini.mp150608d
 
         }
 
-        private void OnMouseDown()
+        public void OnMouseDown()
         {
             if (!enabled) return;
             if (!selected)
