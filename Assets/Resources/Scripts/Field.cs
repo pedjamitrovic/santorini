@@ -3,79 +3,82 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Field : MonoBehaviour
+namespace etf.santorini.mp150608d
 {
-    public Material defaultMaterial;
-    public Material selectMaterial;
-    public GameController gameController;
-    public int level;
-    public string position;
-    public string[] neighbours;
-    public new bool enabled;
-    public bool selected;
-    public bool paused;
-
-
-    // Use this for initialization
-    void Start()
+    public class Field : MonoBehaviour
     {
-        gameController = GameObject.Find("GameController").GetComponent<GameController>();
-        GetComponent<Renderer>().material = defaultMaterial;
-    }
+        public Material defaultMaterial;
+        public Material selectMaterial;
+        public GameController gameController;
+        public int level;
+        public string position;
+        public string[] neighbours;
+        public new bool enabled;
+        public bool selected;
+        public bool paused;
 
-    // Update is called once per frame
-    void Update()
-    {
 
-    }
-
-    private void OnMouseDown()
-    {
-        if (!enabled) return;
-        if (!selected)
+        // Use this for initialization
+        void Start()
         {
-            GetComponent<Renderer>().material = selectMaterial;
-            gameController.GetComponent<GameController>().selectedField = this.gameObject;
-            gameController.GetComponent<GameController>().semaphore.Release(1);
-        }
-        else
-        {
+            gameController = GameObject.Find("GameController").GetComponent<GameController>();
             GetComponent<Renderer>().material = defaultMaterial;
         }
-        selected = !selected;
-    }
 
-    private void OnMouseEnter()
-    {
-        if (!enabled) return;
-        if (!selected) GetComponent<Renderer>().material = selectMaterial;
-    }
+        // Update is called once per frame
+        void Update()
+        {
 
-    private void OnMouseExit()
-    {
-        if (!enabled || paused) return;
-        if (!selected) GetComponent<Renderer>().material = defaultMaterial;
-    }
+        }
 
-    public void Enable()
-    {
-        enabled = true;
-        paused = false;
-        selected = false;
-        GetComponent<Renderer>().material = defaultMaterial;
-    }
+        private void OnMouseDown()
+        {
+            if (!enabled) return;
+            if (!selected)
+            {
+                GetComponent<Renderer>().material = selectMaterial;
+                gameController.GetComponent<GameController>().selectedField = this.gameObject;
+                gameController.GetComponent<GameController>().semaphore.Release(1);
+            }
+            else
+            {
+                GetComponent<Renderer>().material = defaultMaterial;
+            }
+            selected = !selected;
+        }
 
-    public void Disable()
-    {
-        selected = false;
-        enabled = false;
-        GetComponent<Renderer>().material = defaultMaterial;
-    }
+        private void OnMouseEnter()
+        {
+            if (!enabled) return;
+            if (!selected) GetComponent<Renderer>().material = selectMaterial;
+        }
 
-    public void Deselect()
-    {
-        selected = false;
-        GetComponent<Renderer>().material = defaultMaterial;
-    }
+        private void OnMouseExit()
+        {
+            if (!enabled || paused) return;
+            if (!selected) GetComponent<Renderer>().material = defaultMaterial;
+        }
 
+        public void Enable()
+        {
+            enabled = true;
+            paused = false;
+            selected = false;
+            GetComponent<Renderer>().material = defaultMaterial;
+        }
+
+        public void Disable()
+        {
+            selected = false;
+            enabled = false;
+            GetComponent<Renderer>().material = defaultMaterial;
+        }
+
+        public void Deselect()
+        {
+            selected = false;
+            GetComponent<Renderer>().material = defaultMaterial;
+        }
+
+    }
 }

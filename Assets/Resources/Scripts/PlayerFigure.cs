@@ -2,78 +2,82 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerFigure : MonoBehaviour
+namespace etf.santorini.mp150608d
 {
-    public Material defaultMaterial;
-    public Material selectMaterial;
-    public GameController gameController;
-    public new bool enabled;
-    public bool selected;
-    public bool paused;
-    public string position;
-    public int level;
-    // Use this for initialization
-    void Start()
+    public class PlayerFigure : MonoBehaviour
     {
-        gameController = GameObject.Find("GameController").GetComponent<GameController>();
-        GetComponent<Renderer>().material = defaultMaterial;
-    }
+        public Material defaultMaterial;
+        public Material selectMaterial;
+        public GameController gameController;
+        public new bool enabled;
+        public bool selected;
+        public bool paused;
+        public string position;
+        public int level;
 
-    // Update is called once per frame
-    void Update()
-    {
-
-    }
-
-    private void OnMouseDown()
-    {
-        if (!enabled) return;
-        if (!selected)
+        // Use this for initialization
+        void Start()
         {
-            GetComponent<Renderer>().material = selectMaterial;
-            gameController.selectedFigure = this.gameObject;
-            gameController.semaphore.Release(1);
+            gameController = GameObject.Find("GameController").GetComponent<GameController>();
+            GetComponent<Renderer>().material = defaultMaterial;
         }
-        else
+
+        // Update is called once per frame
+        void Update()
         {
-            Enable();
-            gameController.selectedFigure = null;
-            gameController.semaphore.Release(1);
-            return;
+
         }
-        selected = !selected;
-    }
 
-    private void OnMouseEnter()
-    {
-        if (!enabled) return;
-        if (!selected) GetComponent<Renderer>().material = selectMaterial;
-    }
+        private void OnMouseDown()
+        {
+            if (!enabled) return;
+            if (!selected)
+            {
+                GetComponent<Renderer>().material = selectMaterial;
+                gameController.selectedFigure = this.gameObject;
+                gameController.semaphore.Release(1);
+            }
+            else
+            {
+                Enable();
+                gameController.selectedFigure = null;
+                gameController.semaphore.Release(1);
+                return;
+            }
+            selected = !selected;
+        }
 
-    private void OnMouseExit()
-    {
-        if (!enabled || paused) return;
-        if (!selected) GetComponent<Renderer>().material = defaultMaterial;
-    }
+        private void OnMouseEnter()
+        {
+            if (!enabled) return;
+            if (!selected) GetComponent<Renderer>().material = selectMaterial;
+        }
 
-    public void Enable()
-    {
-        enabled = true;
-        paused = false;
-        selected = false;
-        GetComponent<Renderer>().material = defaultMaterial;
-    }
+        private void OnMouseExit()
+        {
+            if (!enabled || paused) return;
+            if (!selected) GetComponent<Renderer>().material = defaultMaterial;
+        }
 
-    public void Disable()
-    {
-        selected = false;
-        enabled = false;
-        GetComponent<Renderer>().material = defaultMaterial;
-    }
+        public void Enable()
+        {
+            enabled = true;
+            paused = false;
+            selected = false;
+            GetComponent<Renderer>().material = defaultMaterial;
+        }
 
-    public void Deselect()
-    {
-        selected = false;
-        GetComponent<Renderer>().material = defaultMaterial;
+        public void Disable()
+        {
+            selected = false;
+            enabled = false;
+            GetComponent<Renderer>().material = defaultMaterial;
+        }
+
+        public void Deselect()
+        {
+            selected = false;
+            GetComponent<Renderer>().material = defaultMaterial;
+        }
     }
 }
