@@ -12,10 +12,10 @@ namespace etf.santorini.mp150608d
         public GameObject selectedField;
         public GameObject selectedFigure;
         public Dictionary<string, GameObject> fields;
-        private List<GameObject> playerFigures;
-        private Player first;
-        private Player second;
-        private Player onTurn;
+        public List<GameObject> playerFigures;
+        public Player first;
+        public Player second;
+        public Player onTurn;
         private bool endGame;
         private Logger log;
 
@@ -30,8 +30,8 @@ namespace etf.santorini.mp150608d
             {
                 fields.Add(fieldObjects[i].GetComponent<Field>().position, fieldObjects[i]);
             }
-            first = new RandomBot("PLAYER 1");
-            second = new RandomBot("PLAYER 2");
+            first = new SimpleBot("PLAYER 1");
+            second = new SimpleBot("PLAYER 2");
             log = new Logger(first, second, "proba" + ".txt");
             onTurn = first;
             StartGame();
@@ -136,6 +136,7 @@ namespace etf.santorini.mp150608d
             }
             return count;
         }
+
         int CountPossibleMoves(string currentPosition)
         {
             EnableAllFields();
@@ -260,6 +261,33 @@ namespace etf.santorini.mp150608d
             if (p == first) return playerFigures[index];
             else if (p == second) return playerFigures[index + 2];
             return null;
+        }
+        public IEnumerable<GameObject> GetPossibleMoves(string currentPosition)
+        {
+            EnableAllFields();
+            string[] neighbours = fields[currentPosition].GetComponent<Field>().neighbours;
+            for (int i = 0; i < neighbours.Length; i++)
+            {
+                if (fields[neighbours[i]].GetComponent<Field>().enabled && fields[neighbours[i]].GetComponent<Field>().level - 1 <= fields[currentPosition].GetComponent<Field>().level)
+                {
+                    yield return fields[neighbours[i]];
+                }
+            }
+            DisableAllFields();
+        }
+
+        public IEnumerable<GameObject> GetPossibleBuilds(string currentPosition)
+        {
+            EnableAllFields();
+            string[] neighbours = fields[currentPosition].GetComponent<Field>().neighbours;
+            for (int i = 0; i < neighbours.Length; i++)
+            {
+                if (fields[neighbours[i]].GetComponent<Field>().enabled && fields[neighbours[i]].GetComponent<Field>().level != 4)
+                {
+                    yield return fields[neighbours[i]];
+                }
+            }
+            DisableAllFields();
         }
     }
 }

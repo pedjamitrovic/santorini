@@ -42,7 +42,7 @@ namespace etf.santorini.mp150608d
                 randomFigure = gameController.FetchMyFigure(this, rnd.Next(2)).GetComponent<PlayerFigure>();
             }
             while (!randomFigure.enabled);
-            randomFigure.OnMouseDown();
+            randomFigure.Pick();
 
             return task;
         }
@@ -61,7 +61,7 @@ namespace etf.santorini.mp150608d
             }
             while (!gameController.fields[randomPosition].GetComponent<Field>().enabled);
 
-            gameController.fields[randomPosition].GetComponent<Field>().OnMouseDown();
+            gameController.fields[randomPosition].GetComponent<Field>().Pick();
 
             return task;
         }
@@ -80,7 +80,7 @@ namespace etf.santorini.mp150608d
             }
             while (!gameController.fields[randomPosition].GetComponent<Field>().enabled);
 
-            gameController.fields[randomPosition].GetComponent<Field>().OnMouseDown();
+            gameController.fields[randomPosition].GetComponent<Field>().Pick();
 
             return task;
         }
@@ -98,7 +98,7 @@ namespace etf.santorini.mp150608d
             }
             while (!gameController.fields[randomPosition].GetComponent<Field>().enabled);
 
-            gameController.fields[randomPosition].GetComponent<Field>().OnMouseDown();
+            gameController.fields[randomPosition].GetComponent<Field>().Pick();
 
             return task;
         }

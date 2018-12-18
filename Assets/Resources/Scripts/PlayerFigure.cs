@@ -26,7 +26,27 @@ namespace etf.santorini.mp150608d
 
         }
 
-        public void OnMouseDown()
+        private void OnMouseDown()
+        {
+            if (gameController.onTurn.GetType() != typeof(Human)) return;
+            if (!enabled) return;
+            if (!selected)
+            {
+                GetComponent<Renderer>().material = selectMaterial;
+                gameController.selectedFigure = this.gameObject;
+                gameController.semaphore.Release(1);
+            }
+            else
+            {
+                Enable();
+                gameController.selectedFigure = null;
+                gameController.semaphore.Release(1);
+                return;
+            }
+            selected = !selected;
+        }
+
+        public void Pick()
         {
             if (!enabled) return;
             if (!selected)
@@ -47,12 +67,14 @@ namespace etf.santorini.mp150608d
 
         private void OnMouseEnter()
         {
+            //if (gameController.onTurn.GetType() != typeof(Human)) return;
             if (!enabled) return;
             if (!selected) GetComponent<Renderer>().material = selectMaterial;
         }
 
         private void OnMouseExit()
         {
+            //if (gameController.onTurn.GetType() != typeof(Human)) return;
             if (!enabled || paused) return;
             if (!selected) GetComponent<Renderer>().material = defaultMaterial;
         }
