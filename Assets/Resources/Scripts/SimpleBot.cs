@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -39,27 +40,9 @@ namespace etf.santorini.mp150608d
             gameController.UI.nextMoveText.text = "SELECT FIGURE";
 
             CalculateMove();
-            List<GameObject> myFigures = new List<GameObject>
-            {
-                gameController.FetchMyFigure(this, 0),
-                gameController.FetchMyFigure(this, 1)
-            };
-            PlayerFigure figure;
-            if (myFigures[0].GetComponent<PlayerFigure>().position == nextGameMove.PreviousFigurePosition)
-            {
-                figure = myFigures[0].GetComponent<PlayerFigure>();
-            }
-            else if (myFigures[1].GetComponent<PlayerFigure>().position == nextGameMove.PreviousFigurePosition)
-            {
-                figure = myFigures[1].GetComponent<PlayerFigure>();
-            }
-            else
-            {
-                figure = null;
-            }
-
-            figure.Pick();
-
+            
+            gameController.FetchFigure(nextGameMove.PreviousFigurePosition).GetComponent<PlayerFigure>().Pick();
+            
             return task;
         }
 
@@ -123,42 +106,38 @@ namespace etf.santorini.mp150608d
                     opponentFigures.Add(fig);
                 }
             }
-            Dictionary<GameObject, string> possibleMoves = new Dictionary<GameObject, string>();
-            foreach (GameObject go in gameController.GetPossibleMoves(myFigures[0].GetComponent<PlayerFigure>().position))
+            var possibleMoves = gameController.gameState.GetPossibleMoves(myFigures[0].GetComponent<PlayerFigure>().position);
+            possibleMoves.AddRange(gameController.gameState.GetPossibleMoves(myFigures[1].GetComponent<PlayerFigure>().position));
+
+            var possibleBuilds = gameController.gameState.GetPossibleBuilds(possibleMoves);
+
+
+            if (possibleBuilds.Count == 0)
             {
-                if (!possibleMoves.ContainsKey(go)) possibleMoves.Add(go, myFigures[0].GetComponent<PlayerFigure>().position);
-            }
-            foreach (GameObject go in gameController.GetPossibleMoves(myFigures[1].GetComponent<PlayerFigure>().position))
-            {
-                if (!possibleMoves.ContainsKey(go)) possibleMoves.Add(go, myFigures[1].GetComponent<PlayerFigure>().position);
+                throw new System.Exception();
             }
 
             float currFunctionValue = 0, maxFunctionValue = float.NegativeInfinity;
             Logger.GameMove bestGameMove = new Logger.GameMove();
-            foreach (var currM in possibleMoves)
+            foreach (Logger.GameMove currGameMove in possibleBuilds)
             {
-                foreach (GameObject currL in gameController.GetPossibleBuilds(currM.Key.GetComponent<Field>().position))
+                float m = gameController.gameState[currGameMove.NextFigurePosition].FieldLevel;
+                float l = gameController.gameState[currGameMove.NewLevelBuildPosition].FieldLevel + 1;
+                float myDistance = 0, opponentDistance = 0;
+                foreach (var myFigure in myFigures)
                 {
-                    float m = currM.Key.GetComponent<Field>().level;
-                    float l = currL.GetComponent<Field>().level + 1;
-                    float myDistance = 0, opponentDistance = 0;
-                    foreach(var myFigure in myFigures)
-                    {
-                        myDistance += Vector3.Distance(myFigure.transform.position, currL.transform.position);
-                    }
-                    foreach (var opponentFigure in opponentFigures)
-                    {
-                        opponentDistance += Vector3.Distance(opponentFigure.transform.position, currL.transform.position);
-                    }
-                    l = l * (myDistance - opponentDistance);
-                    currFunctionValue = m + l;
-                    if (currFunctionValue >= maxFunctionValue)
-                    {
-                        maxFunctionValue = currFunctionValue;
-                        bestGameMove.PreviousFigurePosition = currM.Value;
-                        bestGameMove.NextFigurePosition = currM.Key.GetComponent<Field>().position;
-                        bestGameMove.NewLevelBuildPosition = currL.GetComponent<Field>().position;
-                    }
+                    myDistance += Vector3.Distance(myFigure.transform.position, gameController.fields[currGameMove.NewLevelBuildPosition].transform.position);
+                }
+                foreach (var opponentFigure in opponentFigures)
+                {
+                    opponentDistance += Vector3.Distance(opponentFigure.transform.position, gameController.fields[currGameMove.NewLevelBuildPosition].transform.position);
+                }
+                l = l * (myDistance - opponentDistance);
+                currFunctionValue = m + l;
+                if (currFunctionValue >= maxFunctionValue)
+                {
+                    maxFunctionValue = currFunctionValue;
+                    bestGameMove = new Logger.GameMove(currGameMove);
                 }
             }
             nextGameMove = bestGameMove;

@@ -16,8 +16,10 @@ namespace etf.santorini.mp150608d
         public Player first;
         public Player second;
         public Player onTurn;
+        public GameState gameState;
         private bool endGame;
         private Logger log;
+
 
         // Use this for initialization
         void Start()
@@ -33,6 +35,7 @@ namespace etf.santorini.mp150608d
             first = new SimpleBot("PLAYER 1");
             second = new SimpleBot("PLAYER 2");
             log = new Logger(first, second, "proba" + ".txt");
+            gameState = new GameState();
             onTurn = first;
             StartGame();
         }
@@ -118,6 +121,7 @@ namespace etf.santorini.mp150608d
         void InstantiatePlayerFigure(Material material)
         {
             playerFigures.Add(prefabSpawner.SpawnPlayerFigure(selectedField, material));
+            gameState[selectedField.GetComponent<Field>().position] = (onTurn == first ? new GameState.GameField(0, -1) : new GameState.GameField(0, -2));
             selectedField = null;
         }
         int ShowPossibleMoves()
@@ -189,6 +193,8 @@ namespace etf.santorini.mp150608d
             selectedFigure.GetComponent<PlayerFigure>().level = selectedField.GetComponent<Field>().level + 1;
             if (selectedFigure.GetComponent<PlayerFigure>().level == 4) endGame = true;
             selectedField = null;
+            gameState[previousFigurePosition].PlayerFigure = 0;
+            gameState[nextFigurePosition].PlayerFigure = (onTurn == first ? -1 : -2);
             log.LogGameMove(onTurn, previousFigurePosition, nextFigurePosition, previousFigurePosition);
         }
         void BuildNewLevel()
@@ -203,6 +209,7 @@ namespace etf.santorini.mp150608d
                 prefabSpawner.SpawnHemisphere(selectedField);
             }
             selectedField.GetComponent<Field>().level++;
+            gameState[selectedField.GetComponent<Field>().position].FieldLevel = selectedField.GetComponent<Field>().level;
             log.AlterLastBuildPosition(onTurn, selectedField.GetComponent<Field>().position);
             selectedField = null;
         }
@@ -262,32 +269,13 @@ namespace etf.santorini.mp150608d
             else if (p == second) return playerFigures[index + 2];
             return null;
         }
-        public IEnumerable<GameObject> GetPossibleMoves(string currentPosition)
+        public GameObject FetchFigure(string currentPosition)
         {
-            EnableAllFields();
-            string[] neighbours = fields[currentPosition].GetComponent<Field>().neighbours;
-            for (int i = 0; i < neighbours.Length; i++)
+            foreach(var figure in playerFigures)
             {
-                if (fields[neighbours[i]].GetComponent<Field>().enabled && fields[neighbours[i]].GetComponent<Field>().level - 1 <= fields[currentPosition].GetComponent<Field>().level)
-                {
-                    yield return fields[neighbours[i]];
-                }
+                if (figure.GetComponent<PlayerFigure>().position == currentPosition) return figure;
             }
-            DisableAllFields();
-        }
-
-        public IEnumerable<GameObject> GetPossibleBuilds(string currentPosition)
-        {
-            EnableAllFields();
-            string[] neighbours = fields[currentPosition].GetComponent<Field>().neighbours;
-            for (int i = 0; i < neighbours.Length; i++)
-            {
-                if (fields[neighbours[i]].GetComponent<Field>().enabled && fields[neighbours[i]].GetComponent<Field>().level != 4)
-                {
-                    yield return fields[neighbours[i]];
-                }
-            }
-            DisableAllFields();
+            return null;
         }
     }
 }

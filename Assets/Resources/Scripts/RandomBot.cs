@@ -17,6 +17,7 @@ namespace etf.santorini.mp150608d
             "D1", "D2", "D3", "D4", "D5",
             "E1", "E2", "E3", "E4", "E5"
         };
+        private Logger.GameMove nextGameMove;
 
         // Update is called once per frame
         void Update()
@@ -36,13 +37,9 @@ namespace etf.santorini.mp150608d
             gameController.UI.onTurnText.text = "ON TURN: " + id;
             gameController.UI.nextMoveText.text = "SELECT FIGURE";
 
-            PlayerFigure randomFigure;
-            do
-            {
-                randomFigure = gameController.FetchMyFigure(this, rnd.Next(2)).GetComponent<PlayerFigure>();
-            }
-            while (!randomFigure.enabled);
-            randomFigure.Pick();
+            CalculateMove();
+            
+            gameController.FetchFigure(nextGameMove.PreviousFigurePosition).GetComponent<PlayerFigure>().Pick();
 
             return task;
         }
@@ -52,16 +49,8 @@ namespace etf.santorini.mp150608d
             var task = Task.Run(() => { semaphore.Wait(); });
             gameController.UI.onTurnText.text = "ON TURN: " + id;
             gameController.UI.nextMoveText.text = "MOVE FIGURE";
-
-            string randomPosition, currentPosition;
-            do
-            {
-                currentPosition = gameController.selectedFigure.GetComponent<PlayerFigure>().position;
-                randomPosition = gameController.fields[currentPosition].GetComponent<Field>().neighbours[rnd.Next(gameController.fields[currentPosition].GetComponent<Field>().neighbours.Length)];
-            }
-            while (!gameController.fields[randomPosition].GetComponent<Field>().enabled);
-
-            gameController.fields[randomPosition].GetComponent<Field>().Pick();
+            
+            gameController.fields[nextGameMove.NextFigurePosition].GetComponent<Field>().Pick();
 
             return task;
         }
@@ -71,16 +60,8 @@ namespace etf.santorini.mp150608d
             var task = Task.Run(() => { semaphore.Wait(); });
             gameController.UI.onTurnText.text = "ON TURN: " + id;
             gameController.UI.nextMoveText.text = "PICK A FIELD TO UPGRADE LEVEL";
-
-            string randomPosition, currentPosition;
-            do
-            {
-                currentPosition = gameController.selectedFigure.GetComponent<PlayerFigure>().position;
-                randomPosition = gameController.fields[currentPosition].GetComponent<Field>().neighbours[rnd.Next(gameController.fields[currentPosition].GetComponent<Field>().neighbours.Length)];
-            }
-            while (!gameController.fields[randomPosition].GetComponent<Field>().enabled);
-
-            gameController.fields[randomPosition].GetComponent<Field>().Pick();
+            
+            gameController.fields[nextGameMove.NewLevelBuildPosition].GetComponent<Field>().Pick();
 
             return task;
         }
@@ -96,11 +77,28 @@ namespace etf.santorini.mp150608d
             {
                 randomPosition = positions[rnd.Next(positions.Length)];
             }
-            while (!gameController.fields[randomPosition].GetComponent<Field>().enabled);
+            while (gameController.gameState[randomPosition].PlayerFigure != 0);
 
             gameController.fields[randomPosition].GetComponent<Field>().Pick();
 
             return task;
+        }
+
+        public void CalculateMove()
+        {
+            PlayerFigure randomFigure;
+            do
+            {
+                randomFigure = gameController.FetchMyFigure(this, rnd.Next(2)).GetComponent<PlayerFigure>();
+            }
+            while (!randomFigure.enabled);
+
+            var possibleMoves = gameController.gameState.GetPossibleMoves(randomFigure.position);
+
+            var possibleBuilds = gameController.gameState.GetPossibleBuilds(possibleMoves);
+
+            int random = rnd.Next(possibleBuilds.Count);
+            nextGameMove = possibleBuilds[random];
         }
 
         public string Id()

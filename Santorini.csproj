@@ -246,6 +246,7 @@
   <ItemGroup>
     <Compile Include="Assets\Resources\Scripts\Field.cs" />
     <Compile Include="Assets\Resources\Scripts\GameController.cs" />
+    <Compile Include="Assets\Resources\Scripts\GameState.cs" />
     <Compile Include="Assets\Resources\Scripts\GameTree.cs" />
     <Compile Include="Assets\Resources\Scripts\Human.cs" />
     <Compile Include="Assets\Resources\Scripts\Logger.cs" />

@@ -4,7 +4,7 @@ using System.IO;
 
 namespace etf.santorini.mp150608d
 {
-    class Logger
+    public class Logger
     {
         public class FigureStartingPosition
         {
@@ -26,6 +26,13 @@ namespace etf.santorini.mp150608d
             public string PreviousFigurePosition { get; set; }
             public string NextFigurePosition { get; set; }
             public string NewLevelBuildPosition { get; set; }
+            public GameMove() { }
+            public GameMove(GameMove gm)
+            {
+                PreviousFigurePosition = gm.PreviousFigurePosition;
+                NextFigurePosition = gm.NextFigurePosition;
+                NewLevelBuildPosition = gm.NewLevelBuildPosition;
+            }
             public new string ToString()
             {
                 return PreviousFigurePosition + " " + NextFigurePosition + " " + NewLevelBuildPosition;
