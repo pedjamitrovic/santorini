@@ -33,6 +33,8 @@ namespace etf.santorini.mp150608d
         };
         public Dictionary<string, GameField> table;
         public GameController gc;
+        public int onTurn;
+        public int notOnTurn;
 
         public GameState()
         {
@@ -42,8 +44,10 @@ namespace etf.santorini.mp150608d
             {
                 table.Add(position, new GameField(0,0));
             }
+            onTurn = (gc.onTurn == gc.first ? -1 : -2);
+            notOnTurn = (onTurn == -1 ? -2 : -1);
         }
-        public GameState(GameState gs)
+        public GameState(GameState gs, int onTurn)
         {
             gc = GameObject.Find("GameController").GetComponent<GameController>();
             table = new Dictionary<string, GameField>();
@@ -51,6 +55,8 @@ namespace etf.santorini.mp150608d
             {
                 table.Add(curr.Key, new GameField(curr.Value));
             }
+            this.onTurn = (onTurn == -1 ? -1 : -2);
+            this.notOnTurn = (onTurn == -1 ? -2 : -1);
         }
         public GameField this[string position]
         {
@@ -62,6 +68,36 @@ namespace etf.santorini.mp150608d
             {
                 table[position] = value;
             }
+        }
+        public float Distance(int player, string field)
+        {
+            float min = float.PositiveInfinity;
+            foreach(var position in GetPlayerPositions(player))
+            {
+                float curr = Math.Max(Math.Abs(field[0] - position[0]), Math.Abs(field[1] - position[1]));
+                if (curr < min) min = curr;
+            }
+            return min;
+        }
+        public void MakeMove(Logger.GameMove move)
+        {
+            table[move.NextFigurePosition].PlayerFigure = table[move.PreviousFigurePosition].PlayerFigure;
+            table[move.PreviousFigurePosition].PlayerFigure = 0;
+            table[move.NewLevelBuildPosition].FieldLevel++;
+            ChangeTurns();
+        }
+        public void UndoMove(Logger.GameMove move)
+        {
+            table[move.PreviousFigurePosition].PlayerFigure = table[move.NextFigurePosition].PlayerFigure;
+            table[move.NextFigurePosition].PlayerFigure = 0;
+            table[move.NewLevelBuildPosition].FieldLevel--;
+            ChangeTurns();
+        }
+        public void ChangeTurns()
+        {
+            var tmp = onTurn;
+            onTurn = notOnTurn;
+            notOnTurn = tmp;
         }
         public List<Logger.GameMove> GetPossibleMoves(string currentPosition)
         {
@@ -111,6 +147,31 @@ namespace etf.santorini.mp150608d
                 }
             }
             return possibleBuilds;
+        }
+        public List<Logger.GameMove> GetPossibleGameMoves()
+        {
+            var playerPositions = GetCurrentPlayerPositions();
+            var possibleMoves = GetPossibleMoves(playerPositions[0]);
+            possibleMoves.AddRange(GetPossibleMoves(playerPositions[1]));
+            return GetPossibleBuilds(possibleMoves);
+        }
+        public List<string> GetCurrentPlayerPositions()
+        {
+            List<string> positions = new List<string>();
+            foreach(var field in table)
+            {
+                if (field.Value.PlayerFigure == onTurn) positions.Add(field.Key);
+            }
+            return positions;
+        }
+        public List<string> GetPlayerPositions(int player)
+        {
+            List<string> positions = new List<string>();
+            foreach (var field in table)
+            {
+                if (field.Value.PlayerFigure == player) positions.Add(field.Key);
+            }
+            return positions;
         }
     }
 }

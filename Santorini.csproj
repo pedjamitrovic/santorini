@@ -247,15 +247,15 @@
     <Compile Include="Assets\Resources\Scripts\Field.cs" />
     <Compile Include="Assets\Resources\Scripts\GameController.cs" />
     <Compile Include="Assets\Resources\Scripts\GameState.cs" />
-    <Compile Include="Assets\Resources\Scripts\GameTree.cs" />
     <Compile Include="Assets\Resources\Scripts\Human.cs" />
     <Compile Include="Assets\Resources\Scripts\Logger.cs" />
     <Compile Include="Assets\Resources\Scripts\MainMenu.cs" />
+    <Compile Include="Assets\Resources\Scripts\MinimaxBot.cs" />
     <Compile Include="Assets\Resources\Scripts\Player.cs" />
     <Compile Include="Assets\Resources\Scripts\PlayerFigure.cs" />
+    <Compile Include="Assets\Resources\Scripts\PlayMenu.cs" />
     <Compile Include="Assets\Resources\Scripts\PrefabSpawner.cs" />
     <Compile Include="Assets\Resources\Scripts\RandomBot.cs" />
-    <Compile Include="Assets\Resources\Scripts\SimpleBot.cs" />
     <Compile Include="Assets\Resources\Scripts\UserInterface.cs" />
     <Compile Include="Assets\Resources\TextMesh Pro\Examples &amp; Extras\Scripts\Benchmark01.cs" />
     <Compile Include="Assets\Resources\TextMesh Pro\Examples &amp; Extras\Scripts\Benchmark01_UGUI.cs" />

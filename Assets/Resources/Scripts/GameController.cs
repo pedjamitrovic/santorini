@@ -32,11 +32,11 @@ namespace etf.santorini.mp150608d
             {
                 fields.Add(fieldObjects[i].GetComponent<Field>().position, fieldObjects[i]);
             }
-            first = new SimpleBot("PLAYER 1");
-            second = new SimpleBot("PLAYER 2");
+            first = new MinimaxBot("PLAYER 1");
+            second = new MinimaxBot("PLAYER 2");
             log = new Logger(first, second, "proba" + ".txt");
-            gameState = new GameState();
             onTurn = first;
+            gameState = new GameState();
             StartGame();
         }
 
@@ -193,8 +193,8 @@ namespace etf.santorini.mp150608d
             selectedFigure.GetComponent<PlayerFigure>().level = selectedField.GetComponent<Field>().level + 1;
             if (selectedFigure.GetComponent<PlayerFigure>().level == 4) endGame = true;
             selectedField = null;
+            gameState[nextFigurePosition].PlayerFigure = gameState[previousFigurePosition].PlayerFigure;
             gameState[previousFigurePosition].PlayerFigure = 0;
-            gameState[nextFigurePosition].PlayerFigure = (onTurn == first ? -1 : -2);
             log.LogGameMove(onTurn, previousFigurePosition, nextFigurePosition, previousFigurePosition);
         }
         void BuildNewLevel()
@@ -210,6 +210,7 @@ namespace etf.santorini.mp150608d
             }
             selectedField.GetComponent<Field>().level++;
             gameState[selectedField.GetComponent<Field>().position].FieldLevel = selectedField.GetComponent<Field>().level;
+            gameState.ChangeTurns();
             log.AlterLastBuildPosition(onTurn, selectedField.GetComponent<Field>().position);
             selectedField = null;
         }
