@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -10,6 +11,8 @@ namespace etf.santorini.mp150608d
         public PrefabSpawner prefabSpawner;
         public UserInterface UI;
         public SemaphoreSlim semaphore;
+        public SemaphoreSlim pausingSemaphore;
+        public bool pauseEveryStep;
         public GameObject selectedField;
         public GameObject selectedFigure;
         public Dictionary<string, GameObject> fields;
@@ -26,6 +29,8 @@ namespace etf.santorini.mp150608d
         void Start()
         {
             semaphore = new SemaphoreSlim(0, 1);
+            pausingSemaphore = new SemaphoreSlim(0, 1);
+            pauseEveryStep = true;
             fields = new Dictionary<string, GameObject>();
             playerFigures = new List<GameObject>();
             GameObject[] fieldObjects = GameObject.FindGameObjectsWithTag("Field");
@@ -43,7 +48,18 @@ namespace etf.santorini.mp150608d
         // Update is called once per frame
         void Update()
         {
-
+            if (!pauseEveryStep) return;
+            if (Input.GetKeyDown("space"))
+            {
+                pausingSemaphore.Release();
+                return;
+            }
+            if (Input.GetKeyDown("return"))
+            {
+                pausingSemaphore.Release();
+                pauseEveryStep = false;
+                return;
+            }
         }
 
         async void StartGame()
@@ -70,6 +86,11 @@ namespace etf.santorini.mp150608d
                 DisableAllFields();
                 ActivatePlayerFigures();
                 await onTurn.CalculateNextMove();
+                if (pauseEveryStep && !(onTurn is Human))
+                {
+                    UI.nextMoveText.text = "PRESS SPACE TO CONTINUE OR RETURN TO STOP PAUSING MOVES";
+                    await Task.Run(() => pausingSemaphore.Wait());
+                }
                 await onTurn.SelectFigure(semaphore);
                 EnableAllFields();
                 if (ShowPossibleMoves() == 0)

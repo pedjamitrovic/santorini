@@ -407,6 +407,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   prefabSpawner: {fileID: 665907742}
   UI: {fileID: 1811880980}
+  pauseEveryStep: 0
   selectedField: {fileID: 0}
   selectedFigure: {fileID: 0}
   playerFigures: []
