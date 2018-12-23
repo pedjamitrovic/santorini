@@ -31,13 +31,20 @@ namespace etf.santorini.mp150608d
             rnd = new System.Random();
         }
 
+        public Task CalculateNextMove()
+        {
+            var task = Task.Run(() => { CalculateMove(); });
+            gameController.UI.onTurnText.text = "ON TURN: " + id;
+            gameController.UI.nextMoveText.text = "CALCULATING...";
+
+            return task;
+        }
+
         public Task SelectFigure(SemaphoreSlim semaphore)
         {
             var task = Task.Run(() => { semaphore.Wait(); });
             gameController.UI.onTurnText.text = "ON TURN: " + id;
             gameController.UI.nextMoveText.text = "SELECT FIGURE";
-
-            CalculateMove();
             
             gameController.FetchFigure(nextGameMove.PreviousFigurePosition).GetComponent<PlayerFigure>().Pick();
 

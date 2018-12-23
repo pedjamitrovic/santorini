@@ -15,6 +15,12 @@ namespace etf.santorini.mp150608d
             gameController = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameController>();
         }
 
+        public Task CalculateNextMove()
+        {
+            var task = Task.Run(() => { });
+            return task;
+        }
+
         public Task SelectFigure(SemaphoreSlim semaphore)
         {
             var task = Task.Run(() => { semaphore.Wait(); });

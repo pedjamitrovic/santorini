@@ -244,6 +244,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\Resources\Scripts\AlphaBetaBot.cs" />
     <Compile Include="Assets\Resources\Scripts\Field.cs" />
     <Compile Include="Assets\Resources\Scripts\GameController.cs" />
     <Compile Include="Assets\Resources\Scripts\GameState.cs" />

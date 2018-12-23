@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace etf.santorini.mp150608d
 {
@@ -32,8 +33,7 @@ namespace etf.santorini.mp150608d
             {
                 fields.Add(fieldObjects[i].GetComponent<Field>().position, fieldObjects[i]);
             }
-            first = new MinimaxBot("PLAYER 1");
-            second = new MinimaxBot("PLAYER 2");
+            InstantiatePlayers();
             log = new Logger(first, second, "proba" + ".txt");
             onTurn = first;
             gameState = new GameState();
@@ -69,6 +69,7 @@ namespace etf.santorini.mp150608d
                 }
                 DisableAllFields();
                 ActivatePlayerFigures();
+                await onTurn.CalculateNextMove();
                 await onTurn.SelectFigure(semaphore);
                 EnableAllFields();
                 if (ShowPossibleMoves() == 0)
@@ -101,6 +102,7 @@ namespace etf.santorini.mp150608d
             UI.onTurnText.text = "";
             UI.nextMoveText.text = "";
             UI.gameOverText.text = "GAME OVER - " + onTurn.Id() + " WINS";
+            UI.finishButton.gameObject.SetActive(true);
             selectedFigure = null;
             DisableAllFigures();
             DisableAllFields();
@@ -123,6 +125,41 @@ namespace etf.santorini.mp150608d
             playerFigures.Add(prefabSpawner.SpawnPlayerFigure(selectedField, material));
             gameState[selectedField.GetComponent<Field>().position] = (onTurn == first ? new GameState.GameField(0, -1) : new GameState.GameField(0, -2));
             selectedField = null;
+        }
+        void InstantiatePlayers()
+        {
+            int player1Type = PlayerPrefs.GetInt("Player1Type");
+            switch (player1Type)
+            {
+                case 0:
+                    first = new Human("PLAYER 1");
+                    break;
+                case 1:
+                    first = new MinimaxBot("PLAYER 1");
+                    break;
+                case 2:
+                    first = new AlphaBetaBot("PLAYER 1");
+                    break;
+                default:
+                    first = new Human("PLAYER 1");
+                    break;
+            }
+            int player2Type = PlayerPrefs.GetInt("Player2Type");
+            switch (player2Type)
+            {
+                case 0:
+                    second = new Human("PLAYER 2");
+                    break;
+                case 1:
+                    second = new MinimaxBot("PLAYER 2");
+                    break;
+                case 2:
+                    second = new AlphaBetaBot("PLAYER 1");
+                    break;
+                default:
+                    second = new Human("PLAYER 2");
+                    break;
+            }
         }
         int ShowPossibleMoves()
         {

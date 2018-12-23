@@ -12,6 +12,8 @@ public class PlayMenu : MonoBehaviour
     // Use this for initialization
     void Start()
     {
+        PlayerPrefs.SetInt("Player1Type", 0);
+        PlayerPrefs.SetInt("Player2Type", 0);
     }
 
     public void PlayGame()
@@ -43,6 +45,8 @@ public class PlayMenu : MonoBehaviour
     public void OnDropdownChange()
     {
         GameObject.Find("Player1Dropdown/Label").GetComponent<TextMeshProUGUI>().text = player1dropdown.options[player1dropdown.value].text;
-        GameObject.Find("Player2Dropdown/Label").GetComponent<TextMeshProUGUI>().text = player1dropdown.options[player2dropdown.value].text;
+        GameObject.Find("Player2Dropdown/Label").GetComponent<TextMeshProUGUI>().text = player2dropdown.options[player2dropdown.value].text;
+        PlayerPrefs.SetInt("Player1Type", player1dropdown.value);
+        PlayerPrefs.SetInt("Player2Type", player2dropdown.value);
     }
 }

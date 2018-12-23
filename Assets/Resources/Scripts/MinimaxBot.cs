@@ -34,13 +34,20 @@ namespace etf.santorini.mp150608d
             rnd = new System.Random();
         }
 
+        public Task CalculateNextMove()
+        {
+            var task = Task.Run(() => { CalculateMove(); });
+            gameController.UI.onTurnText.text = "ON TURN: " + id;
+            gameController.UI.nextMoveText.text = "CALCULATING...";
+            
+            return task;
+        }
+
         public Task SelectFigure(SemaphoreSlim semaphore)
         {
             var task = Task.Run(() => { semaphore.Wait(); });
             gameController.UI.onTurnText.text = "ON TURN: " + id;
-            gameController.UI.nextMoveText.text = "CALCULATING...";
-
-            CalculateMove();
+            gameController.UI.nextMoveText.text = "PICK FIGURE";
 
             gameController.FetchFigure(nextGameMove.PreviousFigurePosition).GetComponent<PlayerFigure>().Pick();
 
@@ -160,57 +167,5 @@ namespace etf.santorini.mp150608d
             float f = m + l;
             return f;
         }
-        /*
-        public void CalculateMove()
-        {
-            List<GameObject> myFigures = new List<GameObject>
-            {
-                gameController.FetchMyFigure(this, 0),
-                gameController.FetchMyFigure(this, 1)
-            };
-            List<GameObject> opponentFigures = new List<GameObject>();
-            foreach (GameObject fig in gameController.playerFigures)
-            {
-                if (fig != myFigures[0] && fig != myFigures[1])
-                {
-                    opponentFigures.Add(fig);
-                }
-            }
-            var possibleMoves = gameController.gameState.GetPossibleMoves(myFigures[0].GetComponent<PlayerFigure>().position);
-            possibleMoves.AddRange(gameController.gameState.GetPossibleMoves(myFigures[1].GetComponent<PlayerFigure>().position));
-
-            var possibleBuilds = gameController.gameState.GetPossibleBuilds(possibleMoves);
-
-
-            if (possibleBuilds.Count == 0)
-            {
-                throw new System.Exception();
-            }
-
-            float currFunctionValue = 0, maxFunctionValue = float.NegativeInfinity;
-            Logger.GameMove bestGameMove = new Logger.GameMove();
-            foreach (Logger.GameMove currGameMove in possibleBuilds)
-            {
-                float m = gameController.gameState[currGameMove.NextFigurePosition].FieldLevel;
-                float l = gameController.gameState[currGameMove.NewLevelBuildPosition].FieldLevel + 1;
-                float myDistance = 0, opponentDistance = 0;
-                foreach (var myFigure in myFigures)
-                {
-                    myDistance += Vector3.Distance(myFigure.transform.position, gameController.fields[currGameMove.NewLevelBuildPosition].transform.position);
-                }
-                foreach (var opponentFigure in opponentFigures)
-                {
-                    opponentDistance += Vector3.Distance(opponentFigure.transform.position, gameController.fields[currGameMove.NewLevelBuildPosition].transform.position);
-                }
-                l = l * (myDistance - opponentDistance);
-                currFunctionValue = m + l;
-                if (currFunctionValue >= maxFunctionValue)
-                {
-                    maxFunctionValue = currFunctionValue;
-                    bestGameMove = new Logger.GameMove(currGameMove);
-                }
-            }
-            nextGameMove = bestGameMove;
-        }*/
     }
 }
