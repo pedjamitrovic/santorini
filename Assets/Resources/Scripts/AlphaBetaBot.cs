@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace etf.santorini.mp150608d
 {
-    class AlphaBetaBot : Player
+    public class AlphaBetaBot : Player
     {
         public string id;
         private GameController gameController;
@@ -19,7 +19,8 @@ namespace etf.santorini.mp150608d
             "D1", "D2", "D3", "D4", "D5",
             "E1", "E2", "E3", "E4", "E5"
         };
-        private Logger.GameMove nextGameMove;
+        public Logger.GameMove nextGameMove;
+        public int depth;
 
         // Update is called once per frame
         void Update()
@@ -27,9 +28,10 @@ namespace etf.santorini.mp150608d
 
         }
 
-        public AlphaBetaBot(string id)
+        public AlphaBetaBot(string id, int depth)
         {
             this.id = id;
+            this.depth = depth;
             gameController = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameController>();
             rnd = new System.Random();
         }
@@ -101,7 +103,7 @@ namespace etf.santorini.mp150608d
         public void CalculateMove()
         {
             float? bestMoveValue = 0;
-            nextGameMove = AlphaBeta(gameController.gameState, true, out bestMoveValue, float.NegativeInfinity, float.PositiveInfinity);
+            nextGameMove = AlphaBeta(gameController.gameState, true, out bestMoveValue, float.NegativeInfinity, float.PositiveInfinity, depth);
         }
         public Logger.GameMove AlphaBeta(GameState currentState, bool maximizingPlayer, out float? est, float? alpha, float? beta, int maxLevel = 3, int current = 0)
         {
@@ -117,7 +119,12 @@ namespace etf.santorini.mp150608d
 
                     float? retEst = null;
                     AlphaBeta(currentState, !maximizingPlayer, out retEst, alpha, beta, maxLevel, current + 1);
-                    
+
+                    if (current == 0)
+                    {
+                        gameController.UI.AddPossibleMove(move, retEst ?? 0f);
+                    }
+
                     currentState.UndoMove(move);
                     if (maximizingPlayer && retEst > currentEst)
                     {

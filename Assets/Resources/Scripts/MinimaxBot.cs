@@ -19,7 +19,8 @@ namespace etf.santorini.mp150608d
             "D1", "D2", "D3", "D4", "D5",
             "E1", "E2", "E3", "E4", "E5"
         };
-        private Logger.GameMove nextGameMove;
+        public Logger.GameMove nextGameMove;
+        public int depth;
 
         // Update is called once per frame
         void Update()
@@ -27,9 +28,10 @@ namespace etf.santorini.mp150608d
 
         }
 
-        public MinimaxBot(string id)
+        public MinimaxBot(string id, int depth)
         {
             this.id = id;
+            this.depth = depth;
             gameController = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameController>();
             rnd = new System.Random();
         }
@@ -101,7 +103,7 @@ namespace etf.santorini.mp150608d
         public void CalculateMove()
         {
             float? bestMoveValue = 0;
-            nextGameMove = Minimax(gameController.gameState, true, out bestMoveValue);
+            nextGameMove = Minimax(gameController.gameState, true, out bestMoveValue, depth);
         }
         public Logger.GameMove Minimax(GameState currentState, bool maximizingPlayer, out float? est, int maxLevel = 3, int current = 0)
         {
@@ -117,6 +119,11 @@ namespace etf.santorini.mp150608d
 
                     float? retEst = null;
                     Minimax(currentState, !maximizingPlayer, out retEst, maxLevel, current + 1);
+
+                    if(current == 0)
+                    {
+                        gameController.UI.AddPossibleMove(move, retEst ?? 0f);
+                    }
 
                     currentState.UndoMove(move);
                     if (maximizingPlayer && retEst > currentEst)

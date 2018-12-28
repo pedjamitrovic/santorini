@@ -43,6 +43,40 @@ namespace etf.santorini.mp150608d
                 if (values.Length < 3) throw new FormatException("Provided string: " + gameMove + " is not a valid format of GameMove.");
                 return new GameMove { PreviousFigurePosition = values[0], NextFigurePosition = values[1], NewLevelBuildPosition = values[2] };
             }
+            public static bool operator ==(GameMove obj1, GameMove obj2)
+            {
+                return (obj1.PreviousFigurePosition == obj2.PreviousFigurePosition
+                            && obj1.NextFigurePosition == obj2.NextFigurePosition
+                            && obj1.NewLevelBuildPosition == obj2.NewLevelBuildPosition);
+            }
+            public static bool operator !=(GameMove obj1, GameMove obj2)
+            {
+                return !(obj1.PreviousFigurePosition == obj2.PreviousFigurePosition
+                            && obj1.NextFigurePosition == obj2.NextFigurePosition
+                            && obj1.NewLevelBuildPosition == obj2.NewLevelBuildPosition);
+            }
+            public override bool Equals(object obj)
+            {
+                if (ReferenceEquals(null, obj))
+                {
+                    return false;
+                }
+                if (ReferenceEquals(this, obj))
+                {
+                    return true;
+                }
+                return obj.GetType() == GetType() && Equals((GameMove)obj);
+            }
+            public override int GetHashCode()
+            {
+                unchecked
+                {
+                    int hashCode = PreviousFigurePosition.GetHashCode();
+                    hashCode = (hashCode * 397) ^ NextFigurePosition.GetHashCode();
+                    hashCode = (hashCode * 397) ^ NewLevelBuildPosition.GetHashCode();
+                    return hashCode;
+                }
+            }
         }
 
         public Player first;
@@ -143,10 +177,25 @@ namespace etf.santorini.mp150608d
                         {
                             firstPlayerGM.Add(GameMove.FromString(line));
                         }
+                        evenLine = !evenLine;
                     }
                 }
             }
             catch (Exception e) { e.ToString(); }
         }
+
+        public void Clean()
+        {
+            firstPlayerGM = new List<GameMove>();
+            firstplayerFSP = null;
+            secondPlayerGM = new List<GameMove>();
+            secondplayerFSP = null;
+        }
+
+        public void SetPlayers(Player first, Player second)
+        {
+            this.first = first;
+            this.second = second;
+        } 
     }
 }

@@ -40,6 +40,14 @@ namespace etf.santorini.mp150608d
             }
             InstantiatePlayers();
             log = new Logger(first, second, "proba" + ".txt");
+            if (PlayerPrefs.GetInt("LoadGame") == 1)
+            {
+                log.ReadFromFile();
+                first = new LoadGameBot(first.Id(), first, log.firstplayerFSP, log.firstPlayerGM);
+                second = new LoadGameBot(second.Id(), second, log.secondplayerFSP, log.secondPlayerGM);
+                log.Clean();
+                log.SetPlayers(first, second);
+            }
             onTurn = first;
             gameState = new GameState();
             StartGame();
@@ -84,13 +92,16 @@ namespace etf.santorini.mp150608d
                     break;
                 }
                 DisableAllFields();
-                ActivatePlayerFigures();
+                UI.ClearPossibleMoves();
                 await onTurn.CalculateNextMove();
+                if(!((onTurn is Human) || (onTurn is LoadGameBot))) UI.ShowPossibleMoves();
                 if (pauseEveryStep && !(onTurn is Human))
                 {
+                    DisableAllFigures();
                     UI.nextMoveText.text = "PRESS SPACE TO CONTINUE OR RETURN TO STOP PAUSING MOVES";
                     await Task.Run(() => pausingSemaphore.Wait());
                 }
+                ActivatePlayerFigures();
                 await onTurn.SelectFigure(semaphore);
                 EnableAllFields();
                 if (ShowPossibleMoves() == 0)
@@ -124,6 +135,7 @@ namespace etf.santorini.mp150608d
             UI.nextMoveText.text = "";
             UI.gameOverText.text = "GAME OVER - " + onTurn.Id() + " WINS";
             UI.finishButton.gameObject.SetActive(true);
+            UI.ClearPossibleMoves();
             selectedFigure = null;
             DisableAllFigures();
             DisableAllFields();
@@ -141,6 +153,21 @@ namespace etf.santorini.mp150608d
             }
             ActivatePlayerFigures();
         }
+        public void RemoveLoadGameBot(LoadGameBot bot)
+        {
+            if (bot == first)
+            {
+                first = bot.realPlayer;
+                onTurn = first;
+                log.first = first;
+            }
+            else if (bot == second)
+            {
+                second = bot.realPlayer;
+                onTurn = second;
+                log.second = second;
+            }
+        }
         void InstantiatePlayerFigure(Material material)
         {
             playerFigures.Add(prefabSpawner.SpawnPlayerFigure(selectedField, material));
@@ -156,10 +183,10 @@ namespace etf.santorini.mp150608d
                     first = new Human("PLAYER 1");
                     break;
                 case 1:
-                    first = new MinimaxBot("PLAYER 1");
+                    first = new MinimaxBot("PLAYER 1", PlayerPrefs.GetInt("Player1Depth"));
                     break;
                 case 2:
-                    first = new AlphaBetaBot("PLAYER 1");
+                    first = new AlphaBetaBot("PLAYER 1", PlayerPrefs.GetInt("Player1Depth"));
                     break;
                 default:
                     first = new Human("PLAYER 1");
@@ -172,10 +199,10 @@ namespace etf.santorini.mp150608d
                     second = new Human("PLAYER 2");
                     break;
                 case 1:
-                    second = new MinimaxBot("PLAYER 2");
+                    second = new MinimaxBot("PLAYER 2", PlayerPrefs.GetInt("Player2Depth"));
                     break;
                 case 2:
-                    second = new AlphaBetaBot("PLAYER 1");
+                    second = new AlphaBetaBot("PLAYER 2", PlayerPrefs.GetInt("Player2Depth"));
                     break;
                 default:
                     second = new Human("PLAYER 2");

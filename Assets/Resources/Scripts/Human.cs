@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace etf.santorini.mp150608d
 {
-    class Human : Player
+    public class Human : Player
     {
         public string id;
         private GameController gameController;

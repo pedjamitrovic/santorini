@@ -3,11 +3,14 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class MainMenu : MonoBehaviour {
-    
-    public void QuitGame()
+namespace etf.santorini.mp150608d
+{
+    public class MainMenu : MonoBehaviour
     {
-        Debug.Log("QUIT");
-        Application.Quit();
+        public void QuitGame()
+        {
+            Debug.Log("QUIT");
+            Application.Quit();
+        }
     }
 }
