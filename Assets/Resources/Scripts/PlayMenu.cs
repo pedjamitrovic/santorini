@@ -100,13 +100,13 @@ namespace etf.santorini.mp150608d
                 GameObject.Find("Player1DropdownDepth/Label").GetComponent<TextMeshProUGUI>().text = player1dropdowndepth.options[player1dropdowndepth.value].text;
                 PlayerPrefs.SetInt("Player1Depth", player1dropdowndepth.value + 2);
             }
-            catch (System.Exception e) { }
+            catch (System.Exception e) { e.ToString(); }
             try
             {
                 GameObject.Find("Player2DropdownDepth/Label").GetComponent<TextMeshProUGUI>().text = player2dropdowndepth.options[player2dropdowndepth.value].text;
                 PlayerPrefs.SetInt("Player2Depth", player2dropdowndepth.value + 2);
             }
-            catch (System.Exception e) { }
+            catch (System.Exception e) { e.ToString(); }
             PlayerPrefs.SetInt("Player1Type", player1dropdown.value);
             PlayerPrefs.SetInt("Player2Type", player2dropdown.value);
         }

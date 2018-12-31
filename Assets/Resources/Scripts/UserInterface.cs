@@ -57,6 +57,14 @@ namespace etf.santorini.mp150608d
                         moveString = "*" + moveString;
                     }
                 }
+                if (gc.onTurn is AdvancedBot)
+                {
+                    AdvancedBot mb = (AdvancedBot)gc.onTurn;
+                    if (mb.nextGameMove == move.Key)
+                    {
+                        moveString = "*" + moveString;
+                    }
+                }
                 GameObject go = Instantiate(textPrefab, possibleMovesContent.transform);
                 go.transform.localPosition = new Vector3(0, i*(-30), 0);
                 go.GetComponent<TextMeshProUGUI>().text = moveString;

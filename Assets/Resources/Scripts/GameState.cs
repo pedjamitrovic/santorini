@@ -61,7 +61,7 @@ namespace etf.santorini.mp150608d
             neighbours.Add("D4", new string[] { "C3", "C4", "C5", "D3", "D5", "E3", "E4", "E5" });
             neighbours.Add("D5", new string[] { "C4", "C5", "D4", "E4", "E5" });
             neighbours.Add("E1", new string[] { "D1", "D2", "E2" });
-            neighbours.Add("E2", new string[] { "D1", "D2", "D3", "E1", "E2" });
+            neighbours.Add("E2", new string[] { "D1", "D2", "D3", "E1", "E3" });
             neighbours.Add("E3", new string[] { "D2", "D3", "D4", "E2", "E4" });
             neighbours.Add("E4", new string[] { "D3", "D4", "D5", "E3", "E5" });
             neighbours.Add("E5", new string[] { "D4", "D5", "E4" });
@@ -107,6 +107,28 @@ namespace etf.santorini.mp150608d
             {
                 float curr = Math.Max(Math.Abs(field[0] - position[0]), Math.Abs(field[1] - position[1]));
                 if (curr < min) min = curr;
+            }
+            return min;
+        }
+        public float Distance(int player, string field, out int fieldLevel, out string fieldLevelPosition)
+        {
+            fieldLevel = -1;
+            fieldLevelPosition = "";
+            float min = float.PositiveInfinity;
+            foreach (var position in GetPlayerPositions(player))
+            {
+                float curr = Math.Max(Math.Abs(field[0] - position[0]), Math.Abs(field[1] - position[1]));
+                if (curr < min)
+                {
+                    min = curr;
+                    fieldLevel = table[position].FieldLevel;
+                    fieldLevelPosition = position;
+                }
+                if (curr == min && fieldLevel < table[position].FieldLevel)
+                {
+                    fieldLevel = table[position].FieldLevel;
+                    fieldLevelPosition = position;
+                }
             }
             return min;
         }

@@ -188,6 +188,9 @@ namespace etf.santorini.mp150608d
                 case 2:
                     first = new AlphaBetaBot("PLAYER 1", PlayerPrefs.GetInt("Player1Depth"));
                     break;
+                case 3:
+                    first = new AdvancedBot("PLAYER 1", PlayerPrefs.GetInt("Player1Depth"));
+                    break;
                 default:
                     first = new Human("PLAYER 1");
                     break;
@@ -203,6 +206,9 @@ namespace etf.santorini.mp150608d
                     break;
                 case 2:
                     second = new AlphaBetaBot("PLAYER 2", PlayerPrefs.GetInt("Player2Depth"));
+                    break;
+                case 3:
+                    second = new AdvancedBot("PLAYER 2", PlayerPrefs.GetInt("Player2Depth"));
                     break;
                 default:
                     second = new Human("PLAYER 2");

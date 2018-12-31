@@ -247,12 +247,13 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\Resources\Scripts\LoadGameBot.cs" />
+    <Compile Include="Assets\Resources\Scripts\AdvancedBot.cs" />
     <Compile Include="Assets\Resources\Scripts\AlphaBetaBot.cs" />
     <Compile Include="Assets\Resources\Scripts\Field.cs" />
     <Compile Include="Assets\Resources\Scripts\GameController.cs" />
     <Compile Include="Assets\Resources\Scripts\GameState.cs" />
     <Compile Include="Assets\Resources\Scripts\Human.cs" />
+    <Compile Include="Assets\Resources\Scripts\LoadGameBot.cs" />
     <Compile Include="Assets\Resources\Scripts\Logger.cs" />
     <Compile Include="Assets\Resources\Scripts\MainMenu.cs" />
     <Compile Include="Assets\Resources\Scripts\MinimaxBot.cs" />
